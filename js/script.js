@@ -1,95 +1,87 @@
 (function ($) {
-
   "use strict";
 
-  // init jarallax parallax
-  var initJarallax = function () {
+  // Init jarallax parallax
+  const initJarallax = () => {
     jarallax(document.querySelectorAll(".jarallax"));
-
     jarallax(document.querySelectorAll(".jarallax-img"), {
       keepImg: true,
     });
-  }
+  };
 
-  // input spinner
-  var initProductQty = function(){
+  // Input spinner
+  const initProductQty = () => {
+    $('.product-qty').each(function () {
+      const $el = $(this);
 
-    $('.product-qty').each(function(){
-
-      var $el_product = $(this);
-      var quantity = 0;
-
-      $el_product.find('.quantity-right-plus').click(function(e){
-          e.preventDefault();
-          var quantity = parseInt($el_product.find('.quantity').val());
-          $el_product.find('.quantity').val(quantity + 1);
+      $el.find('.quantity-right-plus').on('click', function (e) {
+        e.preventDefault();
+        const quantity = parseInt($el.find('.quantity').val(), 10) || 0;
+        $el.find('.quantity').val(quantity + 1);
       });
 
-      $el_product.find('.quantity-left-minus').click(function(e){
-          e.preventDefault();
-          var quantity = parseInt($el_product.find('.quantity').val());
-          if(quantity>0){
-            $el_product.find('.quantity').val(quantity - 1);
-          }
+      $el.find('.quantity-left-minus').on('click', function (e) {
+        e.preventDefault();
+        const quantity = parseInt($el.find('.quantity').val(), 10) || 0;
+        if (quantity > 0) {
+          $el.find('.quantity').val(quantity - 1);
+        }
       });
-
     });
+  };
 
-  }
+  // Init Chocolat lightbox
+  const initChocolat = () => {
+    Chocolat(document.querySelectorAll('.image-link'), {
+      imageSize: 'contain',
+      loop: true,
+    });
+  };
 
-  // init Chocolat light box
-	var initChocolat = function () {
-		Chocolat(document.querySelectorAll('.image-link'), {
-			imageSize: 'contain',
-			loop: true,
-		})
-	}
-
-  // Animate Texts
-  var initTextFx = function () {
+  // Animate texts (no inline styles)
+  const initTextFx = () => {
     $('.txt-fx').each(function () {
-      var newstr = '';
-      var count = 0;
-      var delay = 0;
-      var stagger = 10;
-      var words = this.textContent.split(/\s/);
-      
-      $.each( words, function( key, value ) {
-        newstr += '<span class="word">';
+      let count = 0;
+      const delay = 0;
+      const stagger = 10;
+      const words = this.textContent.split(/\s/);
+      let newstr = '';
 
-        for ( var i = 0, l = value.length; i < l; i++ ) {
-          newstr += "<span class='letter' style='transition-delay:"+ ( delay + stagger * count ) +"ms;'>"+ value[ i ] +"</span>";
+      words.forEach((word) => {
+        newstr += `<span class="word">`;
+        for (let i = 0; i < word.length; i++) {
+          newstr += `<span class='letter' data-delay='${delay + stagger * count}'>${word[i]}</span>`;
           count++;
         }
-        newstr += '</span>';
-        newstr += "<span class='letter' style='transition-delay:"+ delay +"ms;'>&nbsp;</span>";
+        newstr += `</span><span class='letter space' data-delay='${delay}'>&nbsp;</span>`;
         count++;
       });
 
       this.innerHTML = newstr;
     });
-  }
+  };
 
+  // On document ready
   $(document).ready(function () {
-
     initProductQty();
     initJarallax();
     initChocolat();
     initTextFx();
 
-    $(".user-items .search-item").click(function () {
+    // Search box toggle
+    $(".user-items .search-item").on("click", function () {
       $(".search-box").toggleClass('active');
       $(".search-box .search-input").focus();
     });
-    $(".close-button").click(function () {
+    $(".close-button").on("click", function () {
       $(".search-box").toggleClass('active');
     });
 
-    var breakpoint = window.matchMedia('(max-width:61.93rem)');
+    const breakpoint = window.matchMedia('(max-width:61.93rem)');
 
-    if (breakpoint.matches === false) {
-      
-      var swiper = new Swiper(".main-swiper", {
+    if (!breakpoint.matches) {
+      // Main Swiper
+      const mainSwiper = new Swiper(".main-swiper", {
         slidesPerView: 1,
         spaceBetween: 48,
         pagination: {
@@ -104,8 +96,8 @@
         },
       });
 
-      // homepage 2 slider
-      var swiper = new Swiper(".thumb-swiper", {
+      // Homepage 2 thumbs
+      const thumbSwiper = new Swiper(".thumb-swiper", {
         direction: 'horizontal',
         slidesPerView: 6,
         spaceBetween: 6,
@@ -116,7 +108,9 @@
           },
         },
       });
-      var swiper2 = new Swiper(".large-swiper", {
+
+      // Homepage 2 large slider
+      const largeSwiper = new Swiper(".large-swiper", {
         spaceBetween: 48,
         effect: 'fade',
         slidesPerView: 1,
@@ -125,48 +119,39 @@
           clickable: true,
         },
         thumbs: {
-          swiper: swiper,
+          swiper: thumbSwiper,
         },
       });
-
     }
 
-    // product single page
-    var thumb_slider = new Swiper(".product-thumbnail-slider", {
+    // Product page thumbnails
+    const thumbSlider = new Swiper(".product-thumbnail-slider", {
       slidesPerView: 5,
       spaceBetween: 10,
-      // autoplay: true,
       direction: "vertical",
       breakpoints: {
-        0: {
-          direction: "horizontal"
-        },
-        992: {
-          direction: "vertical"
-        },
+        0: { direction: "horizontal" },
+        992: { direction: "vertical" },
       },
     });
 
-    // product large
-    var large_slider = new Swiper(".product-large-slider", {
+    // Product large image slider
+    const largeSlider = new Swiper(".product-large-slider", {
       slidesPerView: 1,
-      // autoplay: true,
       spaceBetween: 0,
       effect: 'fade',
       thumbs: {
-        swiper: thumb_slider,
+        swiper: thumbSlider,
       },
       pagination: {
         el: ".swiper-pagination",
         clickable: true,
       },
     });
+  });
 
-    
-
-  }); // End of a document
-
-  $(window).load(function(){
+  // Preloader (modern load event)
+  $(window).on('load', function () {
     $('.preloader').fadeOut();
   });
 
